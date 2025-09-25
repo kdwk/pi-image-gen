@@ -1,0 +1,234 @@
+# The name of the image.
+name: m2-dev-ws
+# The human readable name to use in the image.
+display-name: M2 Development Workspace for Raspberry Pi
+# An integer used to track changes to the image definition file.
+revision: 1
+# The architecture of the image to create.
+architecture: arm64
+# The Ubuntu codename to use as apt sources. Example: noble
+series: noble
+# The classification for this image.
+class: preinstalled
+# An alternative kernel to install in the image. Normally this
+# is just one kernel and defaults to "linux", but we support
+# installing more than one, since installer images can provide
+# multiple kernels to choose from.
+kernel: linux-image-raspi
+# gadget defines the boot assets of an image. When building a
+# classic image, the gadget is optionally compiled as part of
+# the state machine run.
+gadget:
+  # An URI pointing to the location of the gadget tree. For
+  # gadgets that need to be built this can be a local path
+  # to a directory or a URL to be git cloned. These gadget
+  # tree builds will automatically have the environment
+  # variables ARCH=<architecture> and SERIES=<series>.
+  # The values for these environment variables are sourced
+  # from this image definition file. For pre-built
+  # gadget trees this must be a local path.
+  # The URI must begin with either http://, https://, or file://
+  url: https://git.launchpad.net/snap-pi
+  # The branch to use if building a gadget tree from git.
+  # Defaults to "main"
+  branch: "classic"
+  # The type of gadget tree source. Currently supported values
+  # are git, directory, and prebuilt. When git is used the url
+  # will be cloned and `make` will be run. When directory is
+  # used, ubuntu-image will change directories into the specified
+  # URL and run `make`. When prebuilt is used, the contents of the
+  # URL are simply copied to the gadget directory.
+  type: "git"
+  # The target to build when running "make". If none is specified
+  # make will be called with no target. This key/value pair has
+  # no effect when the gadget.type is "prebuilt"
+  # target: <string> (optional)
+# A path to a model assertion to use when pre-seeding snaps
+# in the image. Must be a local file URI beginning with file://
+# The given path will be interpreted as relative to the path of
+# the image definition file if is not absolute.
+# model-assertion: <string> (optional)
+# Defines parameters needed to build the rootfs for a classic
+# image. Currently only building from a seed is supported.
+# Exactly one of the following must be included: seed,
+# archive-tasks, or tarball.
+rootfs:
+  archive: ubuntu
+  sources-list-deb822: true
+  components:
+    - main
+    - restricted
+    - universe
+    - multiverse
+  mirror: http://ports.ubuntu.com/ubuntu-ports/
+  pocket: updates
+  seed:
+    urls:
+      - git://git.launchpad.net/~ubuntu-core-dev/ubuntu-seeds/+git/
+    branch: noble
+    names:
+      - server
+      - server-raspi
+      - raspi-common
+      - minimal
+      - standard
+      - cloud-image
+      - supported-raspi-common
+
+customization:
+  cloud-init:
+    user-data: |
+      #cloud-config
+      package-update: true
+      package-upgrade: true
+      chpasswd:
+        expire: false
+        users:
+          - name: m2
+            gecos: M2 Developer
+            groups: users, admin
+            homedir: /home/m2/
+            sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+            shell: /bin/bash
+      
+  extra-snaps:
+    - name: snapd
+  # After the rootfs has been created and before the image
+  # artifacts are generated, ubuntu-image can automatically
+  # perform some manual customization to the rootfs.
+  # manual:
+    # Create directories in the rootfs of the image
+    # make-dirs:
+    #   -
+        # The path to the directory to create
+        # Every intermediate directories missing on the path
+        # will be created.
+        # path: 
+        # Permissions to give to the directory and any missing
+        # intermediate directories.
+        # permissions: <uint32>
+    # Copies files from the host system to the rootfs of
+    # the image.
+    # copy-file:
+    #   -
+    #     # The path to the file to copy.
+    #     # The given path will be interpreted as relative to the
+    #     # path of the image definition file if is not absolute.
+    #     source: ./resources/ros2_ws/
+    #     # The path to use as a destination for the copied
+    #     # file. The location of the rootfs will be prepended
+    #     # to this path automatically.
+    #     destination: /home/m2/ros2_ws
+    # Creates empty files in the rootfs of the image.
+    # touch-file: (optional)
+    #   -
+    #     # The location of the rootfs will be prepended to this
+    #     # path automatically.
+    #     path: <string>
+    # Chroots into the rootfs and executes an executable file.
+    # This customization state is run after the copy-files state,
+    # so files that have been copied into the rootfs are valid
+    # targets to be executed.
+    # execute: (optional)
+    #   -
+    #     # Path inside the rootfs.
+    #     path: <string>
+    # Any additional users to add in the rootfs
+    # We recommend using cloud-init when possible and fallback
+    # on this method if not possible (e.g performance issues)
+    # add-user: (optional)
+    #   -
+    #     # The name for the user
+    #     name: <string>
+    #     # The UID to assing to this new user
+    #     id: <string> (optional)
+    #     # Password. This can be a plain text or a hashed value.
+    #     # This password will immediately expire and force the user to
+    #     # renew it at first login.
+    #     password: <string> (optional)
+    #     # Type of password submitted above. Defaults to "hash"
+    #     password-type: text | hash (optional)
+    # add-group: (optional)
+    #   -
+    #     # The name of the group to create.
+    #     name: <string>
+    #     # The GID to assign to this group.
+    #     gid: <string> (optional)
+  # Set a custom fstab. The existing one (if any) will be truncated.
+  fstab:
+    -
+      # the value of LABEL= for the fstab entry
+      label: "writable"
+      # where to mount the partition
+      mountpoint: "/"
+      # the filesystem type
+      filesystem-type: "ext4"
+      # options for mounting the filesystem
+      # mount-options: <string> (optional)
+      # whether or not to dump the filesystem
+      dump: false
+      # the order to fsck the filesystem
+      fsck-order: 1
+    -
+      label: "system-boot"
+      mountpoint: "/boot/firmware"
+      filesystem-type: "vfat"
+      mount-options: "defaults"
+      dump: false
+      fsck-order: 1
+# Define the types of artifacts to create, including the actual images,
+# manifest files, changelogs, and a list of files in the rootfs.
+# If this is not set, only the rootfs will be created.
+artifacts:
+  # Used to specify that ubuntu-image should create a .img file.
+  img:
+    -
+      # Name to output the .img file.
+      name: m2-dev-ws-24.04-preinstalled-arm64+raspi.img
+      # Volume from the gadget from which to create the image
+      # volume: <string> (optional for single volume gadgets,
+      #                   required for multi-volume gadgets)
+  # Used to specify that ubuntu-image should create a .iso file.
+  # Not yet supported.
+  # iso: (optional)
+  #   -
+  #     # Name to output the .iso file.
+  #     name: <string>
+  #     # Volume from the gadget from which to create the image
+  #     volume: <string> (optional for single volume gadgets,
+  #                       required for multi-volume gadgets)
+  #     # Specify parameters to use when calling `xorriso`. When not
+  #     # provided, ubuntu-image will attempt to create it's own
+  #     # `xorriso` command.
+  #     xorriso-command: <string> (optional)
+  # Used to specify that ubuntu-image should create a .qcow2 file.
+  # If a .img file is specified for the corresponding volume, the
+  # existing .img will be re-used and converted into a qcow2 image.
+  # Otherwise, a new raw image will be created and then converted
+  # to qcow2.
+  # qcow2: (optional)
+  #   -
+  #     # Name to output the .qcow2 file.
+  #     name: <string>
+  #     # Volume from the gadget from which to create the image
+  #     volume: <string> (optional for single volume gadgets,
+  #                       required for multi-volume gadgets)
+  # A manifest file is a list of all packages and their version
+  # numbers that are included in the rootfs of the image.
+  manifest:
+    # Name to output the manifest file.
+    name: m2-dev-ws-24.04-preinstalled-arm64+raspi.manifest
+  # # A filelist is a list of all files in the rootfs of the image.
+  # filelist:
+  #   # Name to output the filelist file.
+  #   name: <string>
+  # Not yet supported.
+  # changelog:
+  #   name: <string>
+  # A tarball of the rootfs that has been built by ubuntu-image.
+  # rootfs-tarball:
+  #   # Name to output the tar archive.
+  #   name: <string>
+  #   # Type of compression to use on the tar archive. Defaults
+  #   # to "uncompressed"
+  #   compression: uncompressed (default) | bzip2 | gzip | xz | zstd (optional)

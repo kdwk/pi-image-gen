@@ -1,0 +1,98 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Format all C++ source files/headers",
+            "command": "find",
+            "args": [
+                "./src",
+                "-iname",
+                "'*.h'",
+                "-o",
+                "-iname",
+                "'*.cpp'",
+                "|",
+                "xargs",
+                "clang-format",
+                "-i"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "ROS2: build workspace",
+            "command": "colcon",
+            "args": ["build"],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "ROS2: build workspace up to package",
+            "command": "colcon",
+            "args": ["build", "--packages-up-to", "${input:pkgName}"],
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "ROS2: clean workspace build cache",
+            "type": "shell",
+            "command": "rm",
+            "args": ["-rf", "build/", "install/"],
+            "problemMatcher": []
+        },
+        {
+            "label": "ROS2: clean package build cache",
+            "type": "shell",
+            "command": "rm",
+            "args": ["-rf", "build/${input:pkgName}/", "install/${input:pkgName}/"],
+            "problemMatcher": []
+        },
+        {
+            "label": "ROS2: echo topic",
+            "type": "shell",
+            "command": "ros2",
+            "args": ["topic", "echo", "${input:topicName}"],
+            "problemMatcher": []
+        },
+        {
+            "label": "ROS2: inspect rate of publisher",
+            "type": "shell",
+            "command": "ros2",
+            "args": ["topic", "hz", "${input:topicName}"],
+            "problemMatcher": []
+        },
+    ],
+    "inputs": [
+        {
+            "id": "newPkgName",
+            "type": "promptString",
+            "description": "Name of new package",
+        },
+        {
+            "id": "pkgName",
+            "type": "promptString",
+            "description": "Package name"
+        },
+        {
+            "id": "topicName",
+            "type": "promptString",
+            "description": "Topic name"
+        }
+    ]
+}

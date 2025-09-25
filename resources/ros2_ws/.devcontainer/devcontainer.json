@@ -1,0 +1,38 @@
+{
+    "name": "M2 Dev",
+    "build": {
+        "dockerfile": "./Dockerfile",
+        "context": ".",
+        "args": {
+            "USERNAME": "kdwk"
+        }
+    },
+    "workspaceFolder": "/home/kdwk/${localWorkspaceFolderBasename}",
+    "mounts": [
+        "source=${localWorkspaceFolder},target=/home/kdwk/${localWorkspaceFolderBasename},type=bind",
+        "source=projectname-bashhistory,target=/commandhistory,type=volume"
+    ],
+    // Setting for running devcontainer as non-root user asura
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "esbenp.prettier-vscode",
+                "ranch-hand-robotics.rde-ros-2",
+                "ms-vscode.cmake-tools"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "C_Cpp.default.cppStandard": "c++20",
+                "[cpp]": {
+                    "editor.defaultFormatter": "ms-vscode.cpptools"
+                },
+                "prettier.tabWidth": 4
+            }
+        }
+    },
+    "containerEnv": {
+        "SHELL": "/bin/bash",
+        "ROS2_WS": "/home/kdwk/${localWorkspaceFolderBasename}"
+    }
+}

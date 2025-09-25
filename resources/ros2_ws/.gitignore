@@ -1,0 +1,7 @@
+build/
+install/
+log/
+m2b/
+trolly/
+.vscode/settings.json
+.DS_Store
