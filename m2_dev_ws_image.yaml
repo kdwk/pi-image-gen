@@ -79,6 +79,7 @@ customization:
   cloud-init:
     user-data: |
       #cloud-config
+      hostname: pi-test
       package-update: true
       package-upgrade: true
       chpasswd:
@@ -90,6 +91,9 @@ customization:
             homedir: /home/m2/
             sudo: ["ALL=(ALL) NOPASSWD:ALL"]
             shell: /bin/bash
+      power-state:
+        mode: reboot
+    network-config: |
       network:
         version: 2
         wifis:
