@@ -97,8 +97,8 @@ customization:
             dhcp4: true
             optional: true
             access-points:
-              "M2-Training":
-                password: "robocon2026"
+              ${WIFI_SSID}:
+                password: ${WIFI_PASSWORD}
       
   extra-snaps:
     - name: snapd
