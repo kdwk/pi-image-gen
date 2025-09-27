@@ -1,0 +1,25 @@
+name: Build image
+on: [push]
+
+jobs:
+  build_image:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Install ubuntu-image
+        runs: |
+          sudo snap install ubuntu-image --classic
+      - name: Build M2 Dev WS image
+        runs: |
+          sudo ubuntu-image classic m2_dev_ws_image.yaml
+      - name: Archive built image
+        uses: actions/upload-artifact@v4
+        with:
+          name: M2 Development Workspace (Raspberry Pi) Image
+          path: m2-dev-ws-24.04-preinstalled-arm64+raspi.img
+      - name: Archive image manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: M2 Development Workspace (Raspberry Pi) Image Manifest
+          path: m2-dev-ws-24.04-preinstalled-arm64+raspi.manifest

@@ -90,6 +90,15 @@ customization:
             homedir: /home/m2/
             sudo: ["ALL=(ALL) NOPASSWD:ALL"]
             shell: /bin/bash
+      network:
+        version: 2
+        wifis:
+          wlan0:
+            dhcp4: true
+            optional: true
+            access-points:
+              "M2-Training":
+                password: "robocon2026"
       
   extra-snaps:
     - name: snapd
