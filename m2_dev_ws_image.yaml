@@ -80,29 +80,22 @@ customization:
     user-data: |
       #cloud-config
       hostname: pi-test
-      package-update: true
-      package-upgrade: true
-      chpasswd:
-        expire: false
-        users:
-          - name: m2
-            gecos: M2 Developer
-            groups: users, admin
-            homedir: /home/m2/
-            sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-            shell: /bin/bash
-      power-state:
-        mode: reboot
+      users:
+        - name: m2
+          gecos: M2 Developer
+          groups: users, admin
+          homedir: /home/m2/
+          sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+          shell: /bin/bash
     network-config: |
-      network:
-        version: 2
-        wifis:
-          wlan0:
-            dhcp4: true
-            optional: true
-            access-points:
-              ${WIFI_SSID}:
-                password: ${WIFI_PASSWORD}
+      version: 2
+      wifis:
+        wlan0:
+          dhcp4: true
+          optional: false
+          access-points:
+            ${WIFI_SSID}:
+              password: ${WIFI_PASSWORD}
       
   extra-snaps:
     - name: snapd
