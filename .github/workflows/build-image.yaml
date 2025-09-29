@@ -12,8 +12,8 @@ jobs:
           sudo snap install ubuntu-image --classic
       - name: Build M2 Dev WS image
         env:
-          WIFI_SSID: ${{ secrets.KDWK_HOME_WIFI_SSID }}
-          WIFI_PASSWORD: ${{ secrets.KDWK_HOME_WIFI_PASSWORD }}
+          WIFI_SSID: ${{ secrets.M2_TRAINING_WIFI_SSID }}
+          WIFI_PASSWORD: ${{ secrets.M2_TRAINING_WIFI_PASSWORD }}
         run: |
           sudo ubuntu-image classic m2_dev_ws_image.yaml
       - name: Archive built image
