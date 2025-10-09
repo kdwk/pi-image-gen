@@ -79,23 +79,42 @@ customization:
   cloud-init:
     user-data: |
       #cloud-config
-      hostname: pi-test
+      hostname: m2-dev
+      manage_etc_hosts: true
+      packages:
+      - avahi-daemon
+      apt:
+        conf: |
+          Acquire {
+            Check-Date "false";
+          };
+
       users:
-        - name: m2
-          gecos: M2 Developer
-          groups: users, admin
-          homedir: /home/m2/
-          sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-          shell: /bin/bash
+      - name: m2
+        groups: users,adm,dialout,audio,netdev,video,plugdev,cdrom,games,input,gpio,spi,i2c,render,sudo
+        shell: /bin/bash
+        lock_passwd: false
+        passwd: $5$VpOWUHiI/9$fsIMdXOzAK8Z1DKjAR1Klnr1IapRwI6hu79USWrfkm8
+
+      ssh_pwauth: true
+
+      timezone: Asia/Hong_Kong
+      keyboard:
+        model: pc105
+        layout: "us"
+    
     network-config: |
       version: 2
-      wifis:
-        wlan0:
-          dhcp4: true
-          optional: false
-          access-points:
-            ${WIFI_SSID}:
-              password: ${WIFI_PASSWORD}
+        wifis:
+          renderer: networkd
+          wlan0:
+            dhcp4: true
+            optional: true
+            access-points:
+              "${WIFI_SSID}":
+                password: ${WIFI_PASSWORD}
+                type: text
+
       
   extra-snaps:
     - name: snapd
